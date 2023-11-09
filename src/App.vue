@@ -1,25 +1,23 @@
 <template>
-  <div class="calc">
-    <div class="data">{{ data }}</div>
-    <div class="result">{{ result }}</div>
-    <button class="button c" @click="clear">C</button>
-    <button class="button del blue" @click="setOperation('/')">÷</button>
-    <button class="button" @click="appendNumber(7)">7</button>
-    <button class="button" @click="appendNumber(8)">8</button>
-    <button class="button" @click="appendNumber(9)">9</button>
-    <button class="button blue" @click="setOperation('*')">x</button>
-    <button class="button" @click="appendNumber(4)">4</button>
-    <button class="button" @click="appendNumber(5)">5</button>
-    <button class="button" @click="appendNumber(6)">6</button>
-    <button class="button blue" @click="setOperation('-')">-</button>
-    <button class="button" @click="appendNumber(1)">1</button>
-    <button class="button" @click="appendNumber(2)">2</button>
-    <button class="button" @click="appendNumber(3)">3</button>
-    <button class="button blue" @click="setOperation('+')">+</button>
-    <button class="button" @click="appendDot">.</button>
-    <button class="button" @click="appendNumber(0)">0</button>
-    <button class="button">space</button>
-    <button class="button blue" @click="calculateResult">=</button>
+  <div class="convent">
+    <input type="number" min="1" v-model="amount" />
+    <select v-model="selectedCurrency">
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="RUB">RUB</option>
+      <option value="AED">AED</option>
+    </select>
+    <p class="text">Преобразовываю</p>
+    <select v-model="targetCurrency">
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="RUB">RUB</option>
+      <option value="AED">AED</option>
+    </select>
+    <button @click="convertCurrency">Магия</button>
+    <p class="number" v-if="convertedAmount !== null">
+      {{ convertedAmount.toFixed(2) }}
+    </p>
   </div>
 </template>
 
@@ -27,95 +25,45 @@
 export default {
   data() {
     return {
-      data: "",
-      result: "",
-      operation: null
+      amount: 1,
+      selectedCurrency: "USD",
+      targetCurrency: "USD",
+      exchangeRates: {
+        USD: 1,
+        EUR: 0.85,
+        RUB: 73.5,
+        AED: 3.67,
+      },
+      convertedAmount: null,
     };
   },
   methods: {
-    appendNumber(number) {
-      this.data += number;
-    },
-    appendDot() {
-      if (this.data.indexOf(".") === -1) {
-        this.data += ".";
+    convertCurrency() {
+      if (this.amount && this.selectedCurrency && this.targetCurrency) {
+        this.convertedAmount = (this.amount / this.exchangeRates[this.selectedCurrency]) * this.exchangeRates[this.targetCurrency];
+      } else {
+        this.convertedAmount = null;
       }
     },
-    setOperation(op) {
-      if (this.operation === null) {
-        this.operation = op;
-        if (op === '÷') {
-          this.data += '/';
-        } else {
-          this.data += op;
-        }
-      }
-    },
-    calculateResult() {
-      this.result = eval(this.data);
-      localStorage.setItem("result", this.result);
-    },
-    clear() {
-      this.data = "";
-      this.result = "";
-      this.operation = null;
-      localStorage.removeItem("result");
-    }
-  }
+  },
 };
 </script>
 
 <style scoped>
-.calc {
-  width: 400px;
-  height: 600px;
+.convent {
+  width: 600px;
   margin: 0 auto;
-  margin-top: 200px;
-  background-color: black;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 15px 0 0 0;
 }
-
-.button {
-  width: 80px;
-  height: 55px;
-  margin-top: 20px;
-  border: none;
-  background-color: silver;
-  border-radius: 24px;
-  margin-left: 10px;
-  font-size: 25px;
+.text {
+  color: black;
 }
-
-.blue {
-  background-color: blue;
-}
-
-.data {
-  color: silver;
-  font-weight: 700;
-  font-size: 30px;
-  margin-left: 230px;
-  position: absolute;
-  margin-top: 50px;
-}
-
-.result {
-  color: white;
-  font-weight: 700;
-  font-size: 30px;
-  margin-left: 180px;
-  margin-top: 150px;
-  position: absolute;
-}
-
-.c {
-  width: 150px;
-  height: 55px;
-  margin-left: 40px;
-  margin-top: 200px;
-}
-
-.del {
-  width: 150px;
-  height: 55px;
+.number {
+  color: black;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 20px;
 }
 </style>
